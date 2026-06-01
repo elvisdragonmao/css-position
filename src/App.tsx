@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, MousePointer2, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type UIEvent } from "react";
 import { CssHighlight } from "./cssHighlighter";
 import { levels, type Level, type ValidationResult } from "./levels";
@@ -10,9 +10,46 @@ function cx(...classes: Array<string | false | null | undefined>) {
 
 const editorIndent = "  ";
 
+type AppMode = "interactive" | "reading";
+
+type ModeToggleProps = {
+	mode: AppMode;
+	onModeChange: (mode: AppMode) => void;
+};
+
+function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
+	return (
+		<div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+			<button
+				type="button"
+				onClick={() => onModeChange("interactive")}
+				className={cx(
+					"inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-semibold transition",
+					mode === "interactive" ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"
+				)}
+			>
+				<MousePointer2 className="h-4 w-4" aria-hidden="true" />
+				互動練習
+			</button>
+			<button
+				type="button"
+				onClick={() => onModeChange("reading")}
+				className={cx(
+					"inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-semibold transition",
+					mode === "reading" ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:text-slate-950"
+				)}
+			>
+				<BookOpen className="h-4 w-4" aria-hidden="true" />
+				文字說明
+			</button>
+		</div>
+	);
+}
+
 type HeaderProps = {
 	level: Level;
 	levels: Level[];
+	mode: AppMode;
 	currentLevelIndex: number;
 	totalLevels: number;
 	isCompleted: boolean;
@@ -20,10 +57,11 @@ type HeaderProps = {
 	onCheck: () => void;
 	onReset: () => void;
 	onNext: () => void;
+	onModeChange: (mode: AppMode) => void;
 	onSelectLevel: (index: number) => void;
 };
 
-function Header({ level, levels, currentLevelIndex, totalLevels, isCompleted, isLastLevel, onCheck, onReset, onNext, onSelectLevel }: HeaderProps) {
+function Header({ level, levels, mode, currentLevelIndex, totalLevels, isCompleted, isLastLevel, onCheck, onReset, onNext, onModeChange, onSelectLevel }: HeaderProps) {
 	const progressPercent = ((currentLevelIndex + 1) / totalLevels) * 100;
 
 	return (
@@ -31,7 +69,12 @@ function Header({ level, levels, currentLevelIndex, totalLevels, isCompleted, is
 			<div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="max-w-3xl">
-						<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:block">
+							<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+							<div className="lg:hidden">
+								<ModeToggle mode={mode} onModeChange={onModeChange} />
+							</div>
+						</div>
 						<div className="mt-2 flex flex-wrap items-center gap-3">
 							<h1 className="text-2xl font-bold tracking-normal text-slate-950 sm:text-3xl">{level.title}</h1>
 							<label className="relative inline-flex items-center">
@@ -51,8 +94,15 @@ function Header({ level, levels, currentLevelIndex, totalLevels, isCompleted, is
 							</label>
 						</div>
 						<p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">{level.instruction}</p>
+						<div className="mt-4 max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-4">
+							<h2 className="text-sm font-bold text-slate-950">觀念說明</h2>
+							<p className="mt-2 text-sm leading-7 text-slate-600">{level.explanation}</p>
+						</div>
 					</div>
-					<div className="flex flex-wrap gap-2">
+					<div className="flex flex-wrap gap-2 lg:justify-end">
+						<div className="hidden w-full justify-end lg:flex">
+							<ModeToggle mode={mode} onModeChange={onModeChange} />
+						</div>
 						<button type="button" onClick={onCheck} className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
 							<CheckCircle2 className="h-4 w-4" aria-hidden="true" />
 							檢查答案
@@ -354,6 +404,180 @@ function StatusPanel({ level, hintIndex, onPreviousHint, onNextHint, onSelectHin
 	);
 }
 
+type StaticResultPreviewProps = {
+	levelId: number;
+};
+
+function StaticResultPreview({ levelId }: StaticResultPreviewProps) {
+	if (levelId === 1) {
+		return (
+			<div className="grid min-h-64 place-items-center bg-slate-50 p-6">
+				<div className="w-72 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+					<div className="flex items-center gap-3">
+						<div className="h-14 w-14 rounded-full bg-gradient-to-br from-sky-200 via-emerald-100 to-violet-200" />
+						<div>
+							<div className="h-4 w-24 rounded bg-slate-900" />
+							<div className="mt-2 h-3 w-36 rounded bg-slate-200" />
+						</div>
+					</div>
+					<div className="mt-5 border-t border-slate-200 pt-4">
+						<span className="relative -top-2 left-3 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 shadow-[0_0_0_2px_rgba(34,197,94,0.2)]">NEW</span>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (levelId === 2) {
+		return (
+			<div className="grid min-h-64 place-items-center bg-slate-50 p-6">
+				<div className="relative w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+					<div className="grid h-32 place-items-center bg-gradient-to-br from-sky-100 via-amber-100 to-violet-100">
+						<div className="h-16 w-28 rotate-[-8deg] rounded-xl bg-white shadow-md" />
+					</div>
+					<span className="absolute right-3 top-3 rounded-full bg-red-100 px-3 py-1 text-xs font-black tracking-wide text-red-800">SALE</span>
+					<div className="p-4">
+						<div className="h-4 w-36 rounded bg-slate-900" />
+						<div className="mt-3 h-3 w-44 rounded bg-slate-200" />
+						<div className="mt-5 h-4 w-20 rounded bg-emerald-500" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (levelId === 3) {
+		return (
+			<div className="relative h-64 overflow-hidden bg-white">
+				<div className="absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between bg-slate-950 px-4 text-xs font-bold text-white">
+					<span>STUDIO NOTES</span>
+					<span className="text-slate-300">作品 文章 聯絡</span>
+				</div>
+				<div className="pt-12">
+					<div className="grid h-28 place-items-center bg-gradient-to-br from-sky-100 to-amber-100">
+						<div className="text-center text-sm font-bold text-slate-700">navbar 固定在 viewport 上方</div>
+					</div>
+					<div className="space-y-3 p-4">
+						<div className="h-10 rounded-lg border border-slate-200 bg-slate-50" />
+						<div className="h-10 rounded-lg border border-slate-200 bg-slate-50" />
+						<div className="h-10 rounded-lg border border-slate-200 bg-slate-50" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (levelId === 4) {
+		return (
+			<div className="grid min-h-64 grid-cols-[120px_1fr] gap-4 bg-slate-50 p-5">
+				<div className="sticky top-5 h-36 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+					<div className="h-3 w-16 rounded bg-slate-900" />
+					<div className="mt-4 space-y-2">
+						<div className="h-2 w-20 rounded bg-slate-200" />
+						<div className="h-2 w-16 rounded bg-slate-200" />
+						<div className="h-2 w-24 rounded bg-slate-200" />
+					</div>
+				</div>
+				<div className="rounded-xl border border-slate-200 bg-white p-4">
+					<div className="h-5 w-40 rounded bg-slate-900" />
+					<div className="mt-5 space-y-3">
+						{Array.from({ length: 8 }, (_, index) => (
+							<div key={index} className="h-3 rounded bg-slate-200" />
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="relative min-h-64 overflow-hidden bg-slate-100 p-6">
+			<div className="grid grid-cols-2 gap-3 opacity-70">
+				{Array.from({ length: 4 }, (_, index) => (
+					<div key={index} className="h-20 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+						<div className="h-3 w-20 rounded bg-slate-900" />
+						<div className="mt-3 h-2 w-24 rounded bg-slate-200" />
+					</div>
+				))}
+			</div>
+			<div className="absolute inset-0 bg-slate-950/45" />
+			<div className="absolute left-1/2 top-14 w-64 -translate-x-1/2 rounded-xl bg-white p-5 shadow-xl">
+				<div className="h-5 w-28 rounded bg-slate-900" />
+				<div className="mt-4 h-3 w-full rounded bg-slate-200" />
+				<div className="mt-2 h-3 w-44 rounded bg-slate-200" />
+				<div className="mt-5 flex justify-end">
+					<div className="h-8 w-16 rounded-lg bg-slate-950" />
+				</div>
+			</div>
+		</div>
+	);
+}
+
+type ReadingVersionProps = {
+	mode: AppMode;
+	onModeChange: (mode: AppMode) => void;
+};
+
+function ReadingVersion({ mode, onModeChange }: ReadingVersionProps) {
+	return (
+		<div className="min-h-screen bg-slate-50 text-slate-950">
+			<header className="border-b border-slate-200 bg-white">
+				<div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
+					<div className="max-w-3xl">
+						<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+						<h1 className="mt-2 text-2xl font-bold tracking-normal text-slate-950 sm:text-3xl">CSS Position 文字教學版</h1>
+						<p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+							在網頁中，所有東西預設都是左到右，上到下。但有時候我們想把東西放在奇怪的地方：導覽列固定在畫面最上方、商品卡片右上角出現 SALE 標籤、彈出視窗蓋在頁面上方...這時就需要使用 CSS Position。
+						</p>
+					</div>
+					<ModeToggle mode={mode} onModeChange={onModeChange} />
+				</div>
+			</header>
+			<main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:px-8">
+				{levels.map(level => (
+					<article key={level.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-panel">
+						<div className="border-b border-slate-200 px-5 py-4">
+							<p className="text-sm font-semibold text-sky-700">
+								Level {level.id} · {level.concept}
+							</p>
+							<h2 className="mt-1 text-xl font-bold text-slate-950">{level.title}</h2>
+						</div>
+						<div className="grid gap-0 lg:grid-cols-[1.1fr_0.95fr_1fr]">
+							<section className="border-b border-slate-200 p-5 lg:border-b-0 lg:border-r">
+								<h3 className="text-sm font-bold text-slate-950">文字說明</h3>
+								<p className="mt-3 text-sm leading-7 text-slate-600">{level.explanation}</p>
+								<p className="mt-4 text-sm leading-7 text-slate-600">{level.resultDescription}</p>
+								<ul className="mt-4 space-y-2">
+									{level.learningPoints.map(point => (
+										<li key={point} className="flex gap-2 text-sm leading-6 text-slate-600">
+											<span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-emerald-500" aria-hidden="true" />
+											<span>{point}</span>
+										</li>
+									))}
+								</ul>
+							</section>
+							<section className="border-b border-slate-200 p-5 lg:border-b-0 lg:border-r">
+								<h3 className="text-sm font-bold text-slate-950">Code example</h3>
+								<pre className="mt-3 overflow-auto rounded-xl bg-slate-950 p-4 font-mono text-sm leading-7">
+									<code>
+										<CssHighlight css={level.codeExample} />
+									</code>
+								</pre>
+							</section>
+							<section className="p-5">
+								<h3 className="text-sm font-bold text-slate-950">畫面結果</h3>
+								<div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+									<StaticResultPreview levelId={level.id} />
+								</div>
+							</section>
+						</div>
+					</article>
+				))}
+			</main>
+		</div>
+	);
+}
+
 type SummaryScreenProps = {
 	onRestart: () => void;
 };
@@ -408,6 +632,7 @@ function SummaryScreen({ onRestart }: SummaryScreenProps) {
 }
 
 function App() {
+	const [mode, setMode] = useState<AppMode>("interactive");
 	const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
 	const [userCss, setUserCss] = useState(levels[0].starterCss);
 	const [hintIndex, setHintIndex] = useState(0);
@@ -486,11 +711,16 @@ function App() {
 		return <SummaryScreen onRestart={handleRestart} />;
 	}
 
+	if (mode === "reading") {
+		return <ReadingVersion mode={mode} onModeChange={setMode} />;
+	}
+
 	return (
 		<div className="min-h-screen bg-slate-50 text-slate-950">
 			<Header
 				level={currentLevel}
 				levels={levels}
+				mode={mode}
 				currentLevelIndex={currentLevelIndex}
 				totalLevels={levels.length}
 				isCompleted={isCompleted}
@@ -498,6 +728,7 @@ function App() {
 				onCheck={handleCheck}
 				onReset={handleReset}
 				onNext={handleNext}
+				onModeChange={setMode}
 				onSelectLevel={handleSelectLevel}
 			/>
 			<main className="mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(360px,0.95fr)_minmax(480px,1.25fr)] lg:px-8">
