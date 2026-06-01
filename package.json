@@ -1,0 +1,32 @@
+{
+	"name": "project",
+	"type": "module",
+	"scripts": {
+		"build": "tsc --noEmit && vite build",
+		"dev": "vite",
+		"format": "prettier --write .",
+		"preinstall": "npx only-allow pnpm",
+		"prepare": "sh -c 'if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then git config core.hooksPath .githooks; fi'",
+		"preview": "vite preview",
+		"test": "tsc --noEmit"
+	},
+	"dependencies": {
+		"lucide-react": "^1.17.0",
+		"react": "^19.2.6",
+		"react-dom": "^19.2.6"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.15",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.2",
+		"autoprefixer": "^10.5.0",
+		"postcss": "^8.5.15",
+		"prettier": "^3.8.3",
+		"prettier-plugin-organize-imports": "^4.3.0",
+		"prettier-plugin-packagejson": "^3.0.2",
+		"tailwindcss": "^3.4.19",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.14"
+	},
+	"packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1"
+}
