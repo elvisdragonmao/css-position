@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Lightbulb, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { levels, type Level, type ValidationResult } from "./levels";
 import { buildPreviewHtml } from "./previewHtml";
@@ -14,12 +14,11 @@ type HeaderProps = {
 	isCompleted: boolean;
 	isLastLevel: boolean;
 	onCheck: () => void;
-	onHint: () => void;
 	onReset: () => void;
 	onNext: () => void;
 };
 
-function Header({ level, currentLevelIndex, totalLevels, isCompleted, isLastLevel, onCheck, onHint, onReset, onNext }: HeaderProps) {
+function Header({ level, currentLevelIndex, totalLevels, isCompleted, isLastLevel, onCheck, onReset, onNext }: HeaderProps) {
 	const progressPercent = ((currentLevelIndex + 1) / totalLevels) * 100;
 
 	return (
@@ -37,14 +36,6 @@ function Header({ level, currentLevelIndex, totalLevels, isCompleted, isLastLeve
 						<p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">{level.instruction}</p>
 					</div>
 					<div className="flex flex-wrap gap-2">
-						<button
-							type="button"
-							onClick={onHint}
-							className="inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-800 transition hover:bg-sky-100"
-						>
-							<Lightbulb className="h-4 w-4" aria-hidden="true" />
-							提示
-						</button>
 						<button type="button" onClick={onCheck} className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
 							<CheckCircle2 className="h-4 w-4" aria-hidden="true" />
 							檢查答案
@@ -136,16 +127,59 @@ function PreviewPanel({ level, userCss }: PreviewPanelProps) {
 type StatusPanelProps = {
 	level: Level;
 	hintIndex: number;
+	onPreviousHint: () => void;
+	onNextHint: () => void;
+	onSelectHint: (index: number) => void;
 	validationResult: ValidationResult | null;
 };
 
-function StatusPanel({ level, hintIndex, validationResult }: StatusPanelProps) {
-	const visibleHint = hintIndex >= 0 ? level.hints[hintIndex] : "按「提示」可以逐步取得方向。";
+function StatusPanel({ level, hintIndex, onPreviousHint, onNextHint, onSelectHint, validationResult }: StatusPanelProps) {
+	const visibleHint = level.hints[hintIndex] ?? level.hints[0];
+	const isFirstHint = hintIndex === 0;
+	const isLastHint = hintIndex === level.hints.length - 1;
 
 	return (
 		<section className="grid gap-4 lg:grid-cols-[1fr_1fr_1.25fr]">
 			<div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
-				<h2 className="text-sm font-bold text-sky-950">目前提示</h2>
+				<div className="flex items-start justify-between gap-3">
+					<div>
+						<h2 className="text-sm font-bold text-sky-950">目前提示</h2>
+						<div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label="提示序號">
+							<span className="mr-1 text-xs font-semibold text-sky-800">提示</span>
+							{level.hints.map((hint, index) => (
+								<button
+									key={hint}
+									type="button"
+									onClick={() => onSelectHint(index)}
+									className={cx("grid h-6 w-6 place-items-center rounded-full text-xs font-bold transition", index === hintIndex ? "bg-sky-700 text-white" : "bg-white text-sky-800 hover:bg-sky-100")}
+									aria-label={`查看提示 ${index + 1}`}
+								>
+									{index + 1}
+								</button>
+							))}
+						</div>
+					</div>
+					<div className="flex gap-1">
+						<button
+							type="button"
+							onClick={onPreviousHint}
+							disabled={isFirstHint}
+							className="grid h-8 w-8 place-items-center rounded-lg border border-sky-200 bg-white text-sky-800 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+							aria-label="上一個提示"
+						>
+							<ChevronLeft className="h-4 w-4" aria-hidden="true" />
+						</button>
+						<button
+							type="button"
+							onClick={onNextHint}
+							disabled={isLastHint}
+							className="grid h-8 w-8 place-items-center rounded-lg border border-sky-200 bg-white text-sky-800 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
+							aria-label="下一個提示"
+						>
+							<ChevronRight className="h-4 w-4" aria-hidden="true" />
+						</button>
+					</div>
+				</div>
 				<p className="mt-2 text-sm leading-6 text-sky-900">{visibleHint}</p>
 			</div>
 			<div className={cx("rounded-xl border p-4", validationResult?.success ? "border-emerald-200 bg-emerald-50" : validationResult ? "border-red-200 bg-red-50" : "border-slate-200 bg-white")}>
@@ -227,7 +261,7 @@ function SummaryScreen({ onRestart }: SummaryScreenProps) {
 function App() {
 	const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
 	const [userCss, setUserCss] = useState(levels[0].starterCss);
-	const [hintIndex, setHintIndex] = useState(-1);
+	const [hintIndex, setHintIndex] = useState(0);
 	const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
 	const [completedLevels, setCompletedLevels] = useState<number[]>([]);
 	const [showSummary, setShowSummary] = useState(false);
@@ -240,7 +274,7 @@ function App() {
 		const nextLevel = levels[nextIndex];
 		setCurrentLevelIndex(nextIndex);
 		setUserCss(nextLevel.starterCss);
-		setHintIndex(-1);
+		setHintIndex(0);
 		setValidationResult(null);
 	}
 
@@ -258,13 +292,21 @@ function App() {
 		}
 	}
 
-	function handleHint() {
+	function handlePreviousHint() {
+		setHintIndex(previous => Math.max(previous - 1, 0));
+	}
+
+	function handleNextHint() {
 		setHintIndex(previous => Math.min(previous + 1, currentLevel.hints.length - 1));
+	}
+
+	function handleSelectHint(index: number) {
+		setHintIndex(index);
 	}
 
 	function handleReset() {
 		setUserCss(currentLevel.starterCss);
-		setHintIndex(-1);
+		setHintIndex(0);
 		setValidationResult(null);
 	}
 
@@ -300,7 +342,6 @@ function App() {
 				isCompleted={isCompleted}
 				isLastLevel={isLastLevel}
 				onCheck={handleCheck}
-				onHint={handleHint}
 				onReset={handleReset}
 				onNext={handleNext}
 			/>
@@ -309,7 +350,7 @@ function App() {
 				<PreviewPanel level={currentLevel} userCss={userCss} />
 			</main>
 			<footer className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-				<StatusPanel level={currentLevel} hintIndex={hintIndex} validationResult={validationResult} />
+				<StatusPanel level={currentLevel} hintIndex={hintIndex} onPreviousHint={handlePreviousHint} onNextHint={handleNextHint} onSelectHint={handleSelectHint} validationResult={validationResult} />
 			</footer>
 		</div>
 	);
