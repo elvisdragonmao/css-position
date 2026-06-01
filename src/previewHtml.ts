@@ -356,10 +356,9 @@ const previewCssByLevel: Record<number, string> = {
 `,
 	5: `
 .level-5-preview {
-  min-height: 100vh;
+  min-height: 1180px;
   position: relative;
-  overflow: hidden;
-  padding: 28px;
+  padding: 28px 28px 90px;
   background:
     radial-gradient(circle at 85% 18%, rgba(14, 165, 233, 0.14), transparent 28%),
     #f8fafc;
@@ -389,6 +388,10 @@ const previewCssByLevel: Record<number, string> = {
   border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-card.tall {
+  min-height: 180px;
 }
 
 .dashboard-card strong {
@@ -574,6 +577,22 @@ const previewHtmlByLevel: Record<number, string> = {
       <div class="dashboard-card">
         <strong>部署狀態</strong>
         <span>最新版本正在預覽環境等待驗收。</span>
+      </div>
+      <div class="dashboard-card tall">
+        <strong>活動紀錄</strong>
+        <span>這個區塊讓預覽頁變長。先不要寫 fixed，往下捲動時觀察 modal 會不會跟著內容離開視窗。</span>
+      </div>
+      <div class="dashboard-card tall">
+        <strong>排程</strong>
+        <span>fixed 元素應該相對 viewport 固定，不會跟著這些頁面內容一起捲走。</span>
+      </div>
+      <div class="dashboard-card">
+        <strong>通知中心</strong>
+        <span>遮罩和 modal 都是常見需要固定在視窗上的 UI。</span>
+      </div>
+      <div class="dashboard-card">
+        <strong>頁面底部</strong>
+        <span>完成後再往下捲動，modal 應該仍停在預覽視窗上方。</span>
       </div>
     </div>
   </main>
