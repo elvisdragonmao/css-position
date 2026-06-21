@@ -1,5 +1,5 @@
 {
-	"name": "project",
+	"name": "css-position",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --noEmit && vite build",

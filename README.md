@@ -4,6 +4,16 @@
 
 教材形式參考 Flexbox Froggy：學生會看到任務說明、提示、CSS 編輯器，以及即時預覽畫面。學生需要修改 CSS，讓預覽區中的網頁元素移動到正確位置。
 
+> 這份專案是科學教育專題研究-認知多媒體研究期末報告，本教材設計主要結合以下理論：
+>
+> - Paivio：Dual Coding Theory
+> - Chandler & Sweller：Split-attention Effect / Cognitive Load Theory
+> - Mayer：Cognitive Theory of Multimedia Learning
+> - Schnotz：Mental Model in Graphics Comprehension
+> - She & Chen：Multimedia Effect and Eye Movement Evidence
+>
+> 這些理論共同支持：多媒體教材不只是加入圖片或動畫，而是要讓學生能有效分配注意力、降低認知負荷，並建立正確的心理模型。
+
 ## 學習目標
 
 完成教材後，學生會練習到：

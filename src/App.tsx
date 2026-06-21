@@ -65,7 +65,7 @@ function Header({ level, levels, mode, currentLevelIndex, totalLevels, isComplet
 	const progressPercent = ((currentLevelIndex + 1) / totalLevels) * 100;
 
 	return (
-		<header className="border-b border-slate-200 bg-white">
+		<header className="shrink-0 border-b border-slate-200 bg-white">
 			<div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="max-w-3xl">
@@ -277,14 +277,14 @@ function EditorPanel({ level, userCss, onChange }: EditorPanelProps) {
 	}
 
 	return (
-		<section className="flex min-h-[560px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-panel">
+		<section className="flex min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-panel lg:h-full">
 			<div className="border-b border-slate-800 px-4 py-3">
 				<h2 className="text-sm font-semibold text-white">CSS 編輯器</h2>
 			</div>
 			<label className="sr-only" htmlFor="css-editor">
 				輸入 CSS
 			</label>
-			<div className="relative min-h-[480px] flex-1 overflow-hidden bg-slate-950">
+			<div className="relative min-h-0 flex-1 overflow-hidden bg-slate-950">
 				<pre aria-hidden="true" className="pointer-events-none absolute inset-0 m-0 overflow-hidden px-4 py-4 font-mono text-sm leading-7">
 					<code ref={highlightLayerRef} className="block min-h-full whitespace-pre-wrap break-words">
 						<CssHighlight css={userCss} />
@@ -314,11 +314,11 @@ function PreviewPanel({ level, userCss }: PreviewPanelProps) {
 	const previewHtml = useMemo(() => buildPreviewHtml(level.id, userCss), [level.id, userCss]);
 
 	return (
-		<section className="flex min-h-[560px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-panel">
+		<section className="flex min-h-[360px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-panel lg:h-full">
 			<div className="border-b border-slate-200 px-4 py-3">
 				<h2 className="text-sm font-semibold text-slate-950">即時預覽</h2>
 			</div>
-			<iframe title={`Level ${level.id} preview`} sandbox="" srcDoc={previewHtml} className="h-[560px] w-full flex-1 bg-white" />
+			<iframe title={`Level ${level.id} preview`} sandbox="" srcDoc={previewHtml} className="min-h-0 w-full flex-1 bg-white" />
 		</section>
 	);
 }
@@ -716,7 +716,7 @@ function App() {
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-50 text-slate-950">
+		<div className="min-h-screen bg-slate-50 text-slate-950 lg:flex lg:min-h-[100dvh] lg:flex-col">
 			<Header
 				level={currentLevel}
 				levels={levels}
@@ -731,11 +731,11 @@ function App() {
 				onModeChange={setMode}
 				onSelectLevel={handleSelectLevel}
 			/>
-			<main className="mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(360px,0.95fr)_minmax(480px,1.25fr)] lg:px-8">
+			<main className="mx-auto grid w-full max-w-7xl gap-5 px-4 py-5 sm:px-6 lg:min-h-[420px] lg:flex-1 lg:grid-cols-[minmax(360px,0.95fr)_minmax(480px,1.25fr)] lg:px-8">
 				<EditorPanel level={currentLevel} userCss={userCss} onChange={handleCssChange} />
 				<PreviewPanel level={currentLevel} userCss={userCss} />
 			</main>
-			<footer className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+			<footer className="mx-auto w-full max-w-7xl shrink-0 px-4 pb-8 sm:px-6 lg:px-8">
 				<StatusPanel level={currentLevel} hintIndex={hintIndex} onPreviousHint={handlePreviousHint} onNextHint={handleNextHint} onSelectHint={handleSelectHint} validationResult={validationResult} />
 			</footer>
 		</div>
