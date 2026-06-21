@@ -9,8 +9,25 @@ function cx(...classes: Array<string | false | null | undefined>) {
 }
 
 const editorIndent = "  ";
+const githubUrl = "https://github.com/elvisdragonmao/css-position/";
+const githubMarkUrl = `${import.meta.env.BASE_URL}Octicons-mark-github.svg`;
 
 type AppMode = "interactive" | "reading";
+
+function GitHubLink() {
+	return (
+		<a
+			href={githubUrl}
+			target="_blank"
+			rel="noreferrer"
+			className="grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-sky-100"
+			aria-label="在 GitHub 開啟專案"
+			title="GitHub"
+		>
+			<img src={githubMarkUrl} alt="" className="h-4 w-4" aria-hidden="true" />
+		</a>
+	);
+}
 
 type ModeToggleProps = {
 	mode: AppMode;
@@ -70,7 +87,10 @@ function Header({ level, levels, mode, currentLevelIndex, totalLevels, isComplet
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="max-w-3xl">
 						<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:block">
-							<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+							<div className="flex items-center gap-2">
+								<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+								<GitHubLink />
+							</div>
 							<div className="lg:hidden">
 								<ModeToggle mode={mode} onModeChange={onModeChange} />
 							</div>
@@ -524,7 +544,10 @@ function ReadingVersion({ mode, onModeChange }: ReadingVersionProps) {
 			<header className="border-b border-slate-200 bg-white">
 				<div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
 					<div className="max-w-3xl">
-						<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+						<div className="flex items-center gap-2">
+							<p className="text-sm font-semibold text-sky-700">網站是怎麼排版的？CSS Position 的使用</p>
+							<GitHubLink />
+						</div>
 						<h1 className="mt-2 text-2xl font-bold tracking-normal text-slate-950 sm:text-3xl">CSS Position 文字教學版</h1>
 						<p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
 							在網頁中，所有東西預設都是左到右，上到下。但有時候我們想把東西放在奇怪的地方：導覽列固定在畫面最上方、商品卡片右上角出現 SALE 標籤、彈出視窗蓋在頁面上方...這時就需要使用 CSS Position。
